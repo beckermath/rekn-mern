@@ -18,36 +18,49 @@ const linkStyles = {
 const GroupList = () => {
     const ctx = React.useContext(AppContext);
     const [loading, setLoading] = React.useState(true);
+    const [people, setPeople] = React.useState([]);
 
     React.useEffect(() => {
         axios.get('http://localhost:3000/api/persons')
             .then(res => {
+                console.log(res);
                 let people = res.data.data;
-                ctx.setPeople(people);
+                setPeople(people);
             })
             .catch(err => {
+                setPeople([]);
                 console.log(err);
             })
             .finally(() => {
                 setLoading(false);
             })
-    }, [ctx]);
+    }, [ctx.numMembers]);
 
-    const handleRemove = React.useCallback((event) => {
-        if(ctx.expenses.length === 0){
-            const removalIndex = ctx.people.indexOf(event.target.id)
-        
-            if(removalIndex > -1){
-                let temp = [...ctx.people];
-                temp.splice(removalIndex, 1);
+    const handleRemove = async (event) => {
+        //needs to check on status of expenses before removing group members
 
-                ctx.setPeople(temp);
+        console.log(event.target.id);
+        console.log(people);
+
+        let personId;
+        people.forEach(element => {
+            //doesnt handle unique names
+            if(element.name === event.target.id){
+                personId = element._id;
             }
-        }
-        else{
-            window.alert("Please clear expenses before removing group members");
-        }
-    }, [ctx])
+        });
+
+        console.log(personId);
+
+        await axios.delete(`http://localhost:3000/api/person/${personId}`)
+            .then(res => {
+                console.log(res);
+                ctx.setNumMembers(ctx.numMembers - 1);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
 
     return (
         <div style={styles}>
@@ -56,13 +69,13 @@ const GroupList = () => {
                 <Spin></Spin>
             }
 
-            {ctx.people.length > 0 &&
+            {people.length > 0 &&
                 <List
                 bordered
-                dataSource = {ctx.people.map(a => a.name)}
+                dataSource = {people.map(a => a.name)}
                 renderItem={item => (
                     <List.Item
-                    actions={[<a href="/#"style = {linkStyles} id = {item} onClick={handleRemove}>remove</a>]}>
+                    actions={[<a href style = {linkStyles} id = {item} onClick={handleRemove}>remove</a>]}>
                         <Typography.Text mark></Typography.Text> {item}
                     </List.Item>
                 )}

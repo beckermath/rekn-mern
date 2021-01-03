@@ -7,10 +7,11 @@ const AppContainer = ({children}) => {
     const [expensesDisplay, setExpensesDisplay] = React.useState([]);
     const [balances, setBalances] = React.useState([]);
     const [payments, setPayments] = React.useState([]);
+    const [numMembers, setNumMembers] = React.useState([]);
 
     return(
         <AppContext.Provider 
-        value ={{people, setPeople, expenses, setExpenses, expensesDisplay, setExpensesDisplay, 
+        value ={{numMembers, setNumMembers, people, setPeople, expenses, setExpenses, expensesDisplay, setExpensesDisplay, 
             balances, setBalances, payments, setPayments}}
         >
             {children}

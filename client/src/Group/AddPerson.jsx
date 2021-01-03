@@ -1,5 +1,5 @@
 import React from 'react';
-
+import axios from 'axios';
 import { FormInput } from "shards-react";
 import { Button } from "shards-react";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -11,18 +11,36 @@ import AppContext from '../AppContext'
 const { Title } = Typography;
 
 const styles = {
-    padding: '20px',
-    margin: 'auto',
-    maxWidth: 600
+  padding: '20px',
+  margin: 'auto',
+  maxWidth: 600
 }
 
 const Input = ({field, form, ...props}) => {
-    return <FormInput {...field} {...props} name='name' placeholder='Name'/>
+  return <FormInput {...field} {...props} name='name' placeholder='Name'/>
 }
+
+
 
 const AddPerson = () => {
   const ctx = React.useContext(AppContext)
   
+  const handleAdd = async(personName) => {
+    await axios.post('http://localhost:3000/api/person', {
+        name: personName,
+        balance: 0
+      })
+      .then((res) => {
+        if(res.status === 201){
+          ctx.setNumMembers(ctx.numMembers + 1);
+        }
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
+
   return (
     <Formik 
     initialValues={{
@@ -33,7 +51,7 @@ const AddPerson = () => {
       .required('Enter a name'),
     })}
     onSubmit={(fields, {resetForm}) => {
-      ctx.setPeople([...ctx.people, fields.name])
+      handleAdd(fields.name);
       resetForm({values:''});
     }}
     render={() => (

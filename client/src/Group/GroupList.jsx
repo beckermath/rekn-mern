@@ -1,8 +1,12 @@
 import React from 'react';
-import axios from 'axios';
+import {getPeople, deletePerson} from '../Api';
 import 'antd/dist/antd.css';
-import AppContext from '../AppContext';
 import { List, Typography, Spin } from 'antd';
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+  } from 'react-query';
 const { Title } = Typography;
 
 const styles = {
@@ -16,63 +20,39 @@ const linkStyles = {
 }
 
 const GroupList = () => {
-    const ctx = React.useContext(AppContext);
-    const [loading, setLoading] = React.useState(true);
-    const [people, setPeople] = React.useState([]);
+    const queryClient = useQueryClient();
+    const {data, status} = useQuery('people', getPeople);
 
-    React.useEffect(() => {
-        axios.get('http://localhost:3000/api/persons')
-            .then(res => {
-                console.log(res);
-                let people = res.data.data;
-                setPeople(people);
-            })
-            .catch(err => {
-                setPeople([]);
-                console.log(err);
-            })
-            .finally(() => {
-                setLoading(false);
-            })
-    }, [ctx.numMembers]);
+    const mutation = useMutation(personId => deletePerson(personId), {
+        //supposed to be onSuccess, but issue with deleting
+        onSettled: () => {
+            queryClient.invalidateQueries('people');
+        } 
+    });
 
-    const handleRemove = async (event) => {
-        //needs to check on status of expenses before removing group members
-
-        console.log(event.target.id);
-        console.log(people);
-
+    const handleRemove = (event) => {
         let personId;
-        people.forEach(element => {
+        data.data.forEach(element => {
             //doesnt handle unique names
             if(element.name === event.target.id){
                 personId = element._id;
             }
         });
 
-        console.log(personId);
-
-        await axios.delete(`http://localhost:3000/api/person/${personId}`)
-            .then(res => {
-                console.log(res);
-                ctx.setNumMembers(ctx.numMembers - 1);
-            })
-            .catch(err => {
-                console.log(err);
-            })
+        mutation.mutate(personId);
     }
 
     return (
         <div style={styles}>
             <Title level = {4}>Current Group</Title>
-            {loading &&
+            {status === 'loading' &&
                 <Spin></Spin>
             }
 
-            {people.length > 0 &&
+            {status === 'success' &&
                 <List
                 bordered
-                dataSource = {people.map(a => a.name)}
+                dataSource = {data.data.map(a => a.name)}
                 renderItem={item => (
                     <List.Item
                     actions={[<a href style = {linkStyles} id = {item} onClick={handleRemove}>remove</a>]}>

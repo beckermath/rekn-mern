@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import {createPerson} from '../Api';
 import { FormInput } from "shards-react";
 import { Button } from "shards-react";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -7,7 +7,10 @@ import "shards-ui/dist/css/shards.min.css"
 import * as Yup from 'yup';
 import { Typography } from 'antd';
 import { Formik, Field, Form } from 'formik';
-import AppContext from '../AppContext'
+import {
+  useMutation,
+  useQueryClient,
+} from 'react-query';
 const { Title } = Typography;
 
 const styles = {
@@ -20,26 +23,13 @@ const Input = ({field, form, ...props}) => {
   return <FormInput {...field} {...props} name='name' placeholder='Name'/>
 }
 
-
-
 const AddPerson = () => {
-  const ctx = React.useContext(AppContext)
-  
-  const handleAdd = async(personName) => {
-    await axios.post('http://localhost:3000/api/person', {
-        name: personName,
-        balance: 0
-      })
-      .then((res) => {
-        if(res.status === 201){
-          ctx.setNumMembers(ctx.numMembers + 1);
-        }
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-  }
+  const queryClient = useQueryClient();
+  const mutation = useMutation(newPerson => createPerson(newPerson), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('people');
+    }
+  })
 
   return (
     <Formik 
@@ -51,7 +41,7 @@ const AddPerson = () => {
       .required('Enter a name'),
     })}
     onSubmit={(fields, {resetForm}) => {
-      handleAdd(fields.name);
+      mutation.mutate({ name: fields.name, balance:0 });
       resetForm({values:''});
     }}
     render={() => (

@@ -1,7 +1,12 @@
 import React from 'react'
-import AppContext from '../AppContext'
+import { getExpenses, deleteExpense } from '../Api'
 import 'antd/dist/antd.css';
-import { List, Typography, Card } from 'antd';
+import { List, Typography, Card, Spin } from 'antd';
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+  } from 'react-query';
 const { Title } = Typography;
 
 const styles = {
@@ -13,42 +18,50 @@ const linkStyles = {
 }
 
 const ExpenseList = () => {
-    const ctx = React.useContext(AppContext);
+    const queryClient = useQueryClient();
+    const {data, status} = useQuery('expenses', getExpenses);
 
-    const handleRemove = React.useCallback((event) => {
-        let removalIndex;
+    //display error when deleting last expense 
+    const mutation = useMutation(expenseId => deleteExpense(expenseId), {
+        //supposed to be onSuccess, but issue with deleting
+        onSettled: () => {
+            queryClient.invalidateQueries('expenses');
 
-        for(let i = 0; i < ctx.expensesDisplay.length; i++){
-            if(ctx.expensesDisplay[i].desc === event.target.id){
-                removalIndex = i;
-                break;
+        } 
+    });
+
+    const handleRemove = (event) => {
+        let expenseId;
+        data.data.forEach(element => {
+            //doesnt handle non-unique descriptions
+            if(element.description === event.target.id){
+                expenseId = element._id;
             }
-        }
+        });
 
-        let temp = [...ctx.expenses];
-        let temp2 = [...ctx.expensesDisplay];
-
-        temp.splice(removalIndex, 1);
-        temp2.splice(removalIndex, 1);
-
-        ctx.setExpenses(temp);
-        ctx.setExpensesDisplay(temp2);
-    }, [ctx]);
+        mutation.mutate(expenseId);
+    }
 
     return(
         <div style={styles}>
             <Title level = {4}>Current Expenses</Title>
-            <List
-            grid={{ gutter: 8, column: 1 }}
-            dataSource={ctx.expensesDisplay}
-            renderItem={item => (
-                <List.Item>
-                    <Card size="small" title = {<Typography>{item.desc} (${item.amount})</Typography>} extra={ 
-                    <a href="/#" style = {linkStyles} id = {item.desc} onClick={handleRemove}>remove</a>}>
-                    {item.payedBy} payed for {item.forWho}</Card>
-                </List.Item>
-            )}
-            />
+            {status === 'loading' &&
+                <Spin></Spin>
+            }
+
+            {status === 'success' &&
+                <List
+                grid={{ gutter: 8, column: 1 }}
+                dataSource={data.data}
+                renderItem={item => (
+                    <List.Item>
+                        <Card size="small" title = {<Typography>{item.description} (${item.amount})</Typography>} extra={ 
+                        <a href style = {linkStyles} id = {item.description} onClick={handleRemove}>remove</a>}>
+                        {item.payedBy} payed for { /*doesnt quite work*/ item.forWho.length === data.data.length ? "everyone" : item.forWho.join(" and ")}</Card>
+                    </List.Item>
+                )}
+                />
+            }
         </div>
     )
 }

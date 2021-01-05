@@ -23,17 +23,19 @@ const GroupList = () => {
     const queryClient = useQueryClient();
     const {data, status} = useQuery('people', getPeople);
 
+    //display error when deleting last person 
     const mutation = useMutation(personId => deletePerson(personId), {
         //supposed to be onSuccess, but issue with deleting
         onSettled: () => {
             queryClient.invalidateQueries('people');
+
         } 
     });
 
     const handleRemove = (event) => {
         let personId;
         data.data.forEach(element => {
-            //doesnt handle unique names
+            //doesnt handle non-unique names
             if(element.name === event.target.id){
                 personId = element._id;
             }

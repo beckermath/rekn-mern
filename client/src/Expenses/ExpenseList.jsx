@@ -26,7 +26,7 @@ const ExpenseList = () => {
         //supposed to be onSuccess, but issue with deleting
         onSettled: () => {
             queryClient.invalidateQueries('expenses');
-
+            queryClient.invalidateQueries('people');
         } 
     });
 

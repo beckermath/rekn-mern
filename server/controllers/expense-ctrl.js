@@ -1,4 +1,5 @@
 const Expense = require('../models/expense-model')
+const { expenseAdded, expenseDeleted } = require('../utilities')
 
 createExpense = (req, res) => {
     const body = req.body
@@ -19,6 +20,7 @@ createExpense = (req, res) => {
     expense
         .save()
         .then(() => {
+            expenseAdded(expense);
             return res.status(201).json({
                 success: true,
                 id: expense._id,
@@ -45,6 +47,7 @@ deleteExpense = async (req, res) => {
                 .json({ success: false, error: `Expense not found` })
         }
 
+        expenseDeleted(expense);
         return res.status(200).json({ success: true, data: expense })
     }).catch(err => console.log(err))
 }

@@ -24,7 +24,7 @@ const Rekn = () => {
             <TabPane tab="Expenses" key="2">
                 <Expense/>
             </TabPane>
-            <TabPane disabled = {ctx.expenses.length === 0} tab="Payments" key="3">
+            <TabPane  tab="Payments" key="3">
                 <Payment/>
             </TabPane>
         </Tabs>

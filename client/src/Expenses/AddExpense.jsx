@@ -62,6 +62,7 @@ const AddExpense2 = () => {
     const mutation = useMutation(newExpense => createExpense(newExpense), {
         onSuccess: () => {
           queryClient.invalidateQueries('expenses');
+          queryClient.invalidateQueries('people');
         }
     })
 

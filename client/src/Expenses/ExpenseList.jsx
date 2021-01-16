@@ -27,6 +27,7 @@ const ExpenseList = () => {
         onSettled: () => {
             queryClient.invalidateQueries('expenses');
             queryClient.invalidateQueries('people');
+            queryClient.invalidateQueries('payments');
         } 
     });
 

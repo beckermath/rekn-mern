@@ -33,3 +33,10 @@ export const deleteExpense = async(expenseId) => {
     const res = await axios.delete(`http://localhost:3000/api/expense/${expenseId}`);
     return res.data;
 }
+
+//payments
+
+export const getPayments = async() => {
+    const res = await axios.get('http://localhost:3000/api/payments');
+    return res.data;
+}

@@ -29,17 +29,6 @@ const Balances = () => {
     const queryClient = useQueryClient();
     const {data, status} = useQuery('people', getPeople);
 
-    
-    const ctx = React.useContext(AppContext);
-
-    const [balances, setBalances] = React.useState([]);
-
-    React.useLayoutEffect(() => {
-        setBalances(getBalances(ctx.people, ctx.expenses))
-    }, [ctx.people, ctx.expenses])
-
-    console.log(getBalances(ctx.people, ctx.expenses))
-
     return (
         <div style={styles}>
             <Title level = {4}>Balances</Title>

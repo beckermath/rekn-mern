@@ -15,7 +15,7 @@ const Payments = () => {
         <div style = {styles}>
             <br/>
             <Title style= {{textAlign: 'center'}}level = {2}>Payments</Title>
-            {/* <PaymentList/><br/> */}
+            <PaymentList/><br/>
             <Balances/>
         </div>
     )

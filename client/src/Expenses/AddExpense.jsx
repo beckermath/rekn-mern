@@ -63,6 +63,7 @@ const AddExpense2 = () => {
         onSuccess: () => {
           queryClient.invalidateQueries('expenses');
           queryClient.invalidateQueries('people');
+          queryClient.invalidateQueries('payments');
         }
     })
 

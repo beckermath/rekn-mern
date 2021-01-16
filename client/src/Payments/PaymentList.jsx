@@ -1,9 +1,15 @@
 import React from 'react'
 import 'antd/dist/antd.css';
 import AppContext from '../AppContext'
-import { List, Typography } from 'antd';
+import { getPayments } from '../Api';
+import { List, Typography, Spin } from 'antd';
 import { getBalances } from '../calculator';
-import {calculateDebts } from '../calculator'
+import {calculateDebts } from '../calculator';
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+  } from 'react-query';
 
 const { Title } = Typography;
 
@@ -12,28 +18,29 @@ const styles = {
 }
 
 const PaymentList2 = () => {
-    const ctx = React.useContext(AppContext);
-    const [payments, setPayments] = React.useState([]);
-
-    React.useLayoutEffect(() => {
-        setPayments(calculateDebts(ctx.people, ctx.expenses))
-    }, [ctx.people, ctx.expenses])
-
-    console.log(getBalances(ctx.people, ctx.expenses))
+    const queryClient = useQueryClient();
+    const {data, status} = useQuery('payments', getPayments);
 
     return (
         <div style={styles}>
-            <Title level = {4}>It would take {payments.length} payments to even out all debts</Title>
-            <List
-            bordered
-            dataSource={payments}
-            renderItem={(payment, index) => (
-                <List.Item>
-                    <Typography.Text mark></Typography.Text> {payment.payer} pays {payment.reciever} ${payment.amount}
-                    
-                </List.Item>
-            )}
-            />
+            {status === 'loading' && 
+                <Spin></Spin>
+            }
+
+            {status === 'success' && 
+                <div>
+                    <Title level = {4}>It would take {data.data.length} payments to even out all debts</Title>
+                    <List
+                    bordered
+                    dataSource={data.data}
+                    renderItem={(payment, index) => (
+                        <List.Item>
+                            <Typography.Text mark></Typography.Text> {payment.payer} pays {payment.receiver} ${payment.amount}
+                        </List.Item>
+                    )}
+                    />
+                </div>
+            } 
         </div>
     )
 }

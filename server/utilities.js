@@ -24,8 +24,6 @@ expenseAdded = (expense) => {
             }
         })
     }
-
-    calculatePayments();
 }
 
 expenseDeleted = (expense) => {
@@ -50,13 +48,9 @@ expenseDeleted = (expense) => {
             }
         })
     }
-
-    calculatePayments();
 }
 
-calculatePayments = async() => {
-
-    //UnhandledPromiseRejection
+calculatePayments = async() => {    
     let people = await Person.find({});
 
     people.sort((a, b) => { return b.balance - a.balance });
@@ -124,6 +118,8 @@ calculatePayments = async() => {
         const payment = new Payment(payments[i]);
         payment.save();
     }
+
+    
 }
 
 smallestPossitiveIndex = (people) => {

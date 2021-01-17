@@ -8,6 +8,7 @@ const AppContainer = ({children}) => {
     const [balances, setBalances] = React.useState([]);
     const [payments, setPayments] = React.useState([]);
     const [numMembers, setNumMembers] = React.useState([]);
+    
 
     return(
         <AppContext.Provider 

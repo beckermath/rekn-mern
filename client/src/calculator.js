@@ -1,91 +1,49 @@
-export const calculateDebts = (group, expensesBad) => {
-    let expenses = new Array(expensesBad.length);
+export const calculatePayments = (people) => {
+    people.sort((a, b) => { return b.balance - a.balance });
 
-    for(var i = 0; i < expenses.length; i++){
-        expenses[i] = {payIndex: expensesBad[i][0], amount: expensesBad[i][1], mooch: expensesBad[i][2]};
-    }
-
-
+    let spi = findSmallestPossitiveIndex(people);
+    let hni = spi + 1;
     let payments = [];
-    let balances = new Array(group.length)
-    let balances2 = [];
 
-    for(i = 0; i < balances.length; i++){
-        balances[i] = 0.0    
-    }
+    let going = true;
 
-    for( i = 0; i < expenses.length; i++)
-    {
-        var minus = parseFloat(expenses[i].amount)/expenses[i].mooch.length;
+    while(going){
+        if(people[spi].balance.toFixed(2) > Math.abs(people[hni].balance.toFixed(2))){
+            people[spi].balance += people[hni].balance;
+            let amount = Math.abs(people[hni].balance).toFixed(2);
+            people[hni].balance = 0;
 
-        balances[expenses[i].payIndex] += parseFloat(expenses[i].amount);
-
-        for(var j = 0; j < expenses[i].mooch.length; j++)
-        {
-            balances[expenses[i].mooch[j]] -= minus;
-        }
-    }
-
-    for( i = 0; i< balances.length; i++)
-    {
-        var n = group[i];
-        var b = parseFloat(balances[i].toFixed(2)); 
-       
-        balances2.push({n, b});
-    }
-
-    balances2.sort(compare);
-    var spi = smallestPositiveIndex(balances2);
-    var hni = spi + 1;
-    var going = true;
-
-
-    while(going)
-    {
-        if(balances2[spi].b > Math.abs(balances2[hni].b))
-        {
-            balances2[spi].b += balances2[hni].b;
-            let amount = Math.abs(balances2[hni].b).toFixed(2);
-            balances2[hni].b = 0;
-
-            let payer = balances2[hni].n;
-            let reciever = balances2[spi].n;
+            let payer = people[hni].name;
+            let receiver = people[spi].name;
 
             hni++;
 
-            let trans = {payer, reciever, amount};
-            payments.push(trans);
+            payments.push({payer, receiver, amount});
         }
-        else if(balances2[spi].b.toFixed(2) === Math.abs(balances2[hni].b.toFixed(2)))
-        {
-            let payer = balances2[balances2.length -1].n;
-            let reciever = balances2[0].n;
-            let amount = Math.abs(balances2[0].b).toFixed(2);
+        else if(people[spi].balance.toFixed(2) === Math.abs(people[hni].balance.toFixed(2))){
+            let payer = people[people.length - 1].name;
+            let receiver = people[0].name;
+            let amount = Math.abs(people[0].balance).toFixed(2);
 
             hni++;
+            spi++;
+
+            payments.push({payer, receiver, amount});
+        }
+        else{
+            people[hni].balance += people[spi].balance;
+            let amount = Math.abs(people[spi].balance).toFixed(2);
+            people[spi].balance = 0;
+
+            let payer = people[hni].name;
+            let receiver = people[spi].name;
+
             spi--;
 
-            let trans = {payer, reciever, amount};
-            payments.push(trans);
-        }
-        else
-        {
-            balances2[hni].b += balances2[spi].b;
-            let amount = Math.abs(balances2[spi].b).toFixed(2);
-            balances2[spi].b = 0;
-            
-
-            let payer = balances2[hni].n;
-            let reciever = balances2[spi].n;
-            
-            spi--;
-
-            let trans = {payer, reciever, amount};
-            payments.push(trans);
+            payments.push({payer, receiver, amount});
         }
 
-        if(hni > balances2.length-1 || spi < 0)
-        {
+        if(hni > people.length - 1 || spi < 0){
             going = false;
         }
     }
@@ -93,64 +51,26 @@ export const calculateDebts = (group, expensesBad) => {
     return payments;
 }
 
-export const getBalances = (group, expensesBad) => {
-    let expenses = new Array(expensesBad.length);
+function findSmallestPossitiveIndex(people) {
+    let max = 0;
 
-    for(var i = 0; i < expenses.length; i++){
-        expenses[i] = {payIndex: expensesBad[i][0], amount: expensesBad[i][1], mooch: expensesBad[i][2]};
-    }
-
-    let balances = new Array(group.length)
-
-    for(i = 0; i < balances.length; i++){
-        balances[i] = 0.0    
-    }
-
-    for( i = 0; i < expenses.length; i++)
-    {
-        var minus = parseFloat(expenses[i].amount)/expenses[i].mooch.length;
-
-        balances[expenses[i].payIndex] += parseFloat(expenses[i].amount);
-
-        for(var j = 0; j < expenses[i].mooch.length; j++)
-        {
-            balances[expenses[i].mooch[j]] -= minus;
+    for(let i = 0; i < people.length; i++){
+        if(people[i].balance > max){
+            max = people[i].balance
         }
     }
 
-    return balances;
-}
+    let sp = max;
 
-function smallestPositiveIndex(balances2){
-    var max = 0;
-
-    for(var i = 0; i < balances2.length; i++)
-    {
-        if(balances2[i].b > max)
-        {
-            max = balances2[i].b;
+    for(let i = 0; i < people.length; i++){
+        if(people[i].balance < sp && people[i].balance > 0){
+            sp = people[i].balance;
         }
     }
 
-    var sp = max;
-
-    for(i = 0; i < balances2.length; i++)
-    {
-        if(balances2[i].b < sp && balances2[i].b > 0)
-        {
-            sp = balances2[i].b;
-        }
-    }
-
-    for(i = 0; i < balances2.length; i++)
-    {
-        if(balances2[i].b === sp)
-        {
+    for(let i = 0; i < people.length; i++){
+        if(people[i].balance === sp){
             return i;
         }
     }
-}
-
-function compare(a, b){
-    return b.b - a.b;
 }

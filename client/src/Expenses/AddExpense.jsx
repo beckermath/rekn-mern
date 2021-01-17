@@ -18,6 +18,7 @@ useQuery,
 useMutation,
 useQueryClient,
 } from 'react-query';
+import AppContext from '../AppContext';
 const { Title } = Typography;
 
 const styles = {
@@ -57,6 +58,7 @@ const InputNum = ({field, form, ...props}) => {
 }
 
 const AddExpense2 = () => {
+    const ctx = React.useContext(AppContext);
     const queryClient = useQueryClient();
     const {data, status} = useQuery('people', getPeople);
     const mutation = useMutation(newExpense => createExpense(newExpense), {
@@ -64,6 +66,7 @@ const AddExpense2 = () => {
           queryClient.invalidateQueries('expenses');
           queryClient.invalidateQueries('people');
           queryClient.invalidateQueries('payments');
+          ctx.setPayments([]);
         }
     })
 

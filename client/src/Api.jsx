@@ -40,3 +40,9 @@ export const getPayments = async() => {
     const res = await axios.get('http://localhost:3000/api/payments');
     return res.data;
 }
+
+export const createPayment = async(newPayment) => {
+    const res = await axios.post(`http://localhost:3000/api/payment`, newPayment);
+    return res.data;
+}
+

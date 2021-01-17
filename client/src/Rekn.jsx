@@ -1,16 +1,12 @@
 import React from 'react';
-
 import 'antd/dist/antd.css';
 import { Tabs } from 'antd';
 import Group from './Group/Group'
 import Expense from './Expenses/Expenses'
 import Payment from './Payments/Payments'
-import AppContext from './AppContext';
 const { TabPane } = Tabs;
 
 const Rekn = () => {
-    const ctx = React.useContext(AppContext);
-
     return (
         <Tabs 
         defaultActiveKey="1" 

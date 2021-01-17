@@ -33,6 +33,22 @@ createPayment = (req, res) => {
         })
 }
 
+deletePayment = async (req, res) => {
+    await Payment.findOneAndDelete({ _id: req.params.id }, (err, payment) => {
+        if (err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+
+        if (!payment) {
+            return res
+                .status(404)
+                .json({ success: false, error: `Payment not found` })
+        }
+
+        return res.status(200).json({ success: true, data: payment })
+    }).catch(err => console.log(err))
+}
+
 getPayments = async (req, res) => {
     await Payment.find({}, (err, payments) => {
         if (err) {
@@ -49,5 +65,6 @@ getPayments = async (req, res) => {
 
 module.exports = {
     getPayments,
-    createPayment
+    createPayment,
+    deletePayment
 }

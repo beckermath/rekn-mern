@@ -7,6 +7,7 @@ import {
     useMutation,
     useQueryClient,
   } from 'react-query';
+import AppContext from '../AppContext';
 const { Title } = Typography;
 
 const styles = {
@@ -18,6 +19,7 @@ const linkStyles = {
 }
 
 const ExpenseList = () => {
+    const ctx = React.useContext(AppContext);
     const queryClient = useQueryClient();
     const {data, status} = useQuery('expenses', getExpenses);
 
@@ -28,6 +30,8 @@ const ExpenseList = () => {
             queryClient.invalidateQueries('expenses');
             queryClient.invalidateQueries('people');
             queryClient.invalidateQueries('payments');
+            ctx.setPayments([]);
+
         } 
     });
 

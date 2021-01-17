@@ -1,13 +1,9 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import AppContext from '../AppContext';
 import { getPeople } from '../Api';
 import { List, Typography, Spin } from 'antd';
-import { getBalances } from '../calculator';
 import {
     useQuery,
-    useMutation,
-    useQueryClient,
   } from 'react-query';
 const { Title } = Typography;
 
@@ -26,7 +22,6 @@ const negative = {
 }
 
 const Balances = () => {
-    const queryClient = useQueryClient();
     const {data, status} = useQuery('people', getPeople);
 
     return (

@@ -71,7 +71,7 @@ const AddExpense2 = () => {
     })
 
     return (
-        <div>
+        <div >
             {status === 'loading' &&
                 <Spin></Spin>
             }

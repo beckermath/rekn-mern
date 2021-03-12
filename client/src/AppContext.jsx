@@ -1,10 +1,7 @@
 import React from 'react';
 
 const AppContext = React.createContext({
-    people: [],
-    expenses: [],
-    expensesDisplay: [],
-    balances: [],
+    expenseTab: false,
     payments: [],
 });
 

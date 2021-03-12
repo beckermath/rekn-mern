@@ -47,6 +47,14 @@ const ExpenseList = () => {
         mutation.mutate(expenseId);
     }
 
+    if(status === 'error'){
+        ctx.setPaymentTab(false);
+    }
+
+    if(status === 'success' && data.data.length > 0){
+        ctx.setPaymentTab(true);
+    }
+
     return(
         <div style={styles}>
             <Title level = {4}>Current Expenses</Title>

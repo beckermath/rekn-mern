@@ -15,7 +15,7 @@ const styles = {
     padding: '20px'
 }
 
-const PaymentList2 = () => {
+const PaymentList = () => {
     const {data, status} = useQuery('people', getPeople);
     const ctx = React.useContext(AppContext);
 
@@ -53,4 +53,4 @@ const PaymentList2 = () => {
     )
 }
 
-export default PaymentList2;
+export default PaymentList;

@@ -7,6 +7,7 @@ import {
     useMutation,
     useQueryClient,
   } from 'react-query';
+import AppContext from '../AppContext';
 const { Title } = Typography;
 
 const styles = {
@@ -20,6 +21,7 @@ const linkStyles = {
 }
 
 const GroupList = () => {
+    const ctx = React.useContext(AppContext);
     const queryClient = useQueryClient();
     const {data, status} = useQuery('people', getPeople);
 
@@ -28,7 +30,6 @@ const GroupList = () => {
         //supposed to be onSuccess, but issue with deleting
         onSettled: () => {
             queryClient.invalidateQueries('people');
-
         } 
     });
 
@@ -42,6 +43,14 @@ const GroupList = () => {
         });
 
         mutation.mutate(personId);
+    }
+
+    if(status === 'success' && data.data.length === 1){
+        ctx.setExpenseTab(false);
+    }
+
+    if(status === 'success' && data.data.length > 1){
+        ctx.setExpenseTab(true);
     }
 
     return (
